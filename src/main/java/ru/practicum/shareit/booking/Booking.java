@@ -7,10 +7,6 @@ import ru.practicum.shareit.item.model.Item;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-bookings.
- */
-
 @Data
 @AllArgsConstructor
 public class Booking {

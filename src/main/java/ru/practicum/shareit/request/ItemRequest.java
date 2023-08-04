@@ -7,10 +7,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-item-requests.
- */
-
 @Data
 @AllArgsConstructor
 public class ItemRequest {
