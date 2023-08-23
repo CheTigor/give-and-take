@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.ForUpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
@@ -21,18 +22,18 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@RequestBody @Valid UserDto userDto) {
-        return userService.create(userDto);
+    public UserDto create(@RequestBody @Valid User user) {
+        return userService.create(user);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@RequestBody @Valid ForUpdateUserDto forUpdateUserDto, @PathVariable("userId") long id) {
-        return userService.update(forUpdateUserDto, id);
+    public UserDto update(@RequestBody @Valid ForUpdateUserDto forUpdateUserDto, @PathVariable("userId") Long userId) {
+        return userService.update(forUpdateUserDto, userId);
     }
 
     @GetMapping("/{userId}")
-    public UserDto getById(@PathVariable("userId") long id) {
-        return userService.getById(id);
+    public UserDto getById(@PathVariable("userId") Long userId) {
+        return userService.getById(userId);
     }
 
     @GetMapping
@@ -41,7 +42,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteById(@PathVariable("userId") long id) {
-        userService.deleteById(id);
+    public void deleteById(@PathVariable("userId") Long userId) {
+        userService.deleteById(userId);
     }
 }

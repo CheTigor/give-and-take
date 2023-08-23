@@ -3,8 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ForUpdateItemDto;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -23,28 +22,28 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto create(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ItemDto create(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.create(itemDto, userId);
     }
 
     @PatchMapping(value = "/{itemId}")
-    public ItemDto update(@RequestBody @Valid ForUpdateItemDto forUpdateItemDto, @PathVariable long itemId,
-                          @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ItemDto update(@RequestBody @Valid ForUpdateItemDto forUpdateItemDto, @PathVariable Long itemId,
+                          @RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.update(forUpdateItemDto, itemId, userId);
     }
 
     @GetMapping(value = "/{itemId}")
-    public ItemDto getById(@PathVariable("itemId") long id, @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ItemDtoResponse getById(@PathVariable("itemId") Long id, @RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.getById(id, userId);
     }
 
     @GetMapping
-    public List<ItemDto> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDtoResponse> getAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.getAll(userId);
     }
 
     @DeleteMapping(value = "/{id}")
-    public void deleteById(@PathVariable long id, @RequestHeader("X-Sharer-User-Id") long userId) {
+    public void deleteById(@PathVariable Long id, @RequestHeader("X-Sharer-User-Id") Long userId) {
         itemService.deleteById(id, userId);
     }
 
@@ -53,5 +52,11 @@ public class ItemController {
         log.info("вызван метод getItemsByQuery - поиск предметов по названию или описанию" +
                 " с query " + query);
         return itemService.getItemsByQuery(query);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentResponseDto createComment(@RequestBody CommentRequestDto commentReq, @RequestHeader("X-Sharer-User-Id") Long userId,
+                                            @PathVariable("itemId") Long itemId) {
+        return itemService.createComment(commentReq, itemId, userId);
     }
 }
