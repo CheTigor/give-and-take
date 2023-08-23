@@ -53,7 +53,7 @@ public class BookingServiceImpl implements BookingService {
         if (!dateValidation(bookingReq)) {
             throw new DateValidationException("Неверный формат даты");
         }
-        if (item.getOwner() == bookerId) {
+        if (item.getOwner().equals(bookerId)) {
             throw new AlreadyIsOwnerException(String.format("Booker уже является владельцем вещи, bookerId: %d, itemId: %d",
                     bookerId, item.getId()));
         }
@@ -72,7 +72,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingNotFoundException(String.format("BookingId не найден в базе, bookingId: %d", bookingId));
         }
         final Booking booking = bookingRepository.findById(bookingId).get();
-        if (booking.getBooker().getId() == userId || booking.getItem().getOwner() == userId) {
+        if (booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().equals(userId)) {
             return BookingMapper.toBookingDto(booking);
         } else {
             throw new UserNotFoundException(String.format(
@@ -161,7 +161,7 @@ public class BookingServiceImpl implements BookingService {
             status = BookingStatus.APPROVED;
         }
         final Long ownerId = booking.getItem().getOwner();
-        if (ownerId == userId) {
+        if (ownerId.equals(userId)) {
             booking.setStatus(status);
         } else {
             throw new MismatchUserIdException(String.format(
