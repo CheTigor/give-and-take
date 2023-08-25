@@ -7,7 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class ForUpdateItemDto {
 
-    private long id;
     private String name;
     private String description;
     private Boolean available;

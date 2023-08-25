@@ -3,8 +3,8 @@ package ru.practicum.shareit.item.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingForItemDtoResponse;
+import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
@@ -52,18 +52,17 @@ public class ItemServiceImpl implements ItemService {
         final Item item = ItemMapper.toItem(null, userId, itemDto);
         Long itemId = itemRepository.save(item).getId();
         log.debug("Успешное создание item: {}", item);
-        return ItemMapper.toItemDto(itemRepository.findById(itemId).get());
+        return ItemMapper.toItemDto(itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(
+                String.format("Item с id: %d не найден", itemId))));
     }
 
     @Override
     public ItemDto update(ForUpdateItemDto forUpdateItemDto, Long itemId, Long userId) {
-        if (!itemRepository.existsById(itemId)) {
-            throw new NullPointerException(String.format("Item с id: %d не существует", itemId));
-        }
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(String.format("Данный пользователь не найден в базе, userId: %d", userId));
         }
-        final Item item = itemRepository.findById(itemId).get();
+        final Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(
+                String.format("Item с id: %d не найден", itemId)));
         userValidate(item, userId);
         if (forUpdateItemDto.getName() != null) {
             item.setName(forUpdateItemDto.getName());
@@ -76,7 +75,8 @@ public class ItemServiceImpl implements ItemService {
         }
         itemRepository.save(item);
         log.debug("Успешное обновление item: {}", item);
-        return ItemMapper.toItemDto(itemRepository.findById(itemId).get());
+        return ItemMapper.toItemDto(itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(
+                String.format("Item с id: %d не найден", itemId))));
     }
 
     @Override
@@ -109,12 +109,11 @@ public class ItemServiceImpl implements ItemService {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(String.format("Данный пользователь не найден в базе, userId: %d", userId));
         }
-        if (itemRepository.existsById(itemId)) {
-            final Item item = itemRepository.findById(itemId).get();
-            userValidate(item, userId);
-            itemRepository.deleteById(itemId);
-            log.debug("Успешное удаление item: {}", item);
-        }
+        final Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(
+                String.format("Item с id: %d не найден", itemId)));
+        userValidate(item, userId);
+        itemRepository.deleteById(itemId);
+        log.debug("Успешное удаление item: {}", item);
     }
 
     @Override
@@ -128,14 +127,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentResponseDto createComment(CommentRequestDto commentReq, Long itemId, Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException(String.format("Данный пользователь не найден в базе, userId: %d", userId));
-        }
-        if (!itemRepository.existsById(itemId)) {
-            throw new ItemNotFoundException(String.format("Данный предмет не найден в базе, itemId: %d", itemId));
-        }
-        final Item item = itemRepository.findById(itemId).get();
-        final User user = userRepository.findById(userId).get();
+        final Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(
+                String.format("Item с id: %d не найден", itemId)));
+        final User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(
+                String.format("User с id: %d не найден", userId)));
         List<Booking> itemBookings = bookingRepository.findByItem_idAndBooker_idAndStatusAndStartIsBefore(itemId, userId,
                 BookingStatus.APPROVED, LocalDateTime.now());
         if (itemBookings.size() == 0) {
@@ -144,6 +139,7 @@ public class ItemServiceImpl implements ItemService {
         }
         final Comment comment = CommentMapper.toComment(null, commentReq, item, user, LocalDateTime.now());
         commentRepository.save(comment);
+        log.debug("Успешное создание comment: {}", comment);
         return CommentMapper.toCommentResponse(comment);
     }
 
@@ -190,7 +186,8 @@ public class ItemServiceImpl implements ItemService {
     private ItemDtoResponse itemResponseBuild(Long itemId, Long userId) {
         final Booking lastBooking = lastBookingsCalculate(itemId, userId);
         final Booking nextBooking = nextBookingsCalculate(itemId, userId);
-        ItemDtoResponse item = ItemMapper.toItemResponse(itemRepository.findById(itemId).get());
+        ItemDtoResponse item = ItemMapper.toItemResponse(itemRepository.findById(itemId).orElseThrow(() ->
+                new ItemNotFoundException(String.format("Item с id: %d не найден", itemId))));
         if (lastBooking != null) {
             item.setLastBooking(new BookingForItemDtoResponse(lastBooking.getId(), lastBooking.getBooker().getId()));
         } else if (nextBooking != null) {

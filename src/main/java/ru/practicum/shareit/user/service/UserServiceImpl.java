@@ -1,7 +1,9 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.dto.ForUpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -17,6 +19,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Autowired
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -25,31 +28,28 @@ public class UserServiceImpl implements UserService {
     public UserDto create(User user) {
         userRepository.save(user);
         log.debug("Успешно создан user: {}", user);
-        return UserMapper.toUserDto(userRepository.findById(user.getId()).get());
+        return UserMapper.toUserDto(userRepository.findById(user.getId()).orElseThrow(() -> new UserNotFoundException(
+                String.format("Booking с id: %d не найден", user.getId()))));
     }
 
     @Override
     public UserDto update(ForUpdateUserDto forUpdateUserDto, Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NullPointerException(String.format("User c userId: %d не существует", userId));
-        }
-        final User user = userRepository.findById(userId).get();
+        final User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(
+                String.format("User с id: %d не найден", userId)));
         if (forUpdateUserDto.getName() != null) {
             user.setName(forUpdateUserDto.getName());
         }
         if (forUpdateUserDto.getEmail() != null) {
             user.setEmail(forUpdateUserDto.getEmail());
         }
+        log.debug("Успешное обновление user: {}", user);
         return UserMapper.toUserDto(userRepository.save(user));
     }
 
     @Override
     public UserDto getById(Long userId) {
-        if (userRepository.existsById(userId)) {
-            return UserMapper.toUserDto(userRepository.findById(userId).get());
-        } else {
-            throw new NullPointerException(String.format("User с userId: %d не существует", userId));
-        }
+        return UserMapper.toUserDto(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(
+                String.format("User с id: %d не найден", userId))));
     }
 
     @Override
@@ -60,5 +60,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteById(Long userId) {
         userRepository.deleteById(userId);
+        log.debug("Успешное удаление user по id: {}", userId);
     }
 }

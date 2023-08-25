@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.mapper;
 
-import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingCreateRequestDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingForItemDtoResponse;
