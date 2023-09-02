@@ -29,6 +29,6 @@ public class Item {
     @Column(name = "user_id", nullable = false)
     private Long owner;
 
-    @Column(name = "request_user_id")
-    private Long request;
+    @Column(name = "request_id")
+    private Long requestId;
 }

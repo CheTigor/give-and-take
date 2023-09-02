@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.UserNotFoundException;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
+
     private final UserRepository userRepository;
 
     @Autowired
@@ -26,10 +28,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto create(User user) {
-        userRepository.save(user);
+        final User savedUser = userRepository.save(user);
         log.debug("Успешно создан user: {}", user);
-        return UserMapper.toUserDto(userRepository.findById(user.getId()).orElseThrow(() -> new UserNotFoundException(
-                String.format("Booking с id: %d не найден", user.getId()))));
+        return UserMapper.toUserDto(savedUser);
     }
 
     @Override
@@ -37,9 +38,11 @@ public class UserServiceImpl implements UserService {
         final User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(
                 String.format("User с id: %d не найден", userId)));
         if (forUpdateUserDto.getName() != null) {
-            user.setName(forUpdateUserDto.getName());
+            if (!forUpdateUserDto.getName().isBlank()) {
+                user.setName(forUpdateUserDto.getName());
+            }
         }
-        if (forUpdateUserDto.getEmail() != null) {
+        if (forUpdateUserDto.getEmail() != null && EmailValidator.getInstance().isValid(forUpdateUserDto.getEmail())) {
             user.setEmail(forUpdateUserDto.getEmail());
         }
         log.debug("Успешное обновление user: {}", user);

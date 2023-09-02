@@ -1,18 +1,23 @@
 package ru.practicum.shareit.item.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import ru.practicum.shareit.item.dto.ItemDto;
+import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
+@Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    @Query("select new ru.practicum.shareit.item.dto.ItemDto(it.id, it.name, it.description, it.available)" +
+    @Query(value = "select it " +
             "from Item as it " +
-            "where (lower(it.name) like %?1% or lower(it.description) like %?1%) and it.available = true")
-    List<ItemDto> findByQueryIgnoreCase(String emailSearch);
+            "where (lower(it.name) like %?1% or lower(it.description) like %?1%) and it.available = true ")
+    Page<Item> findByQueryIgnoreCase(String querySearch, Pageable pageable);
 
-    List<Item> findByOwner(Long userId);
+    Page<Item> findByOwner(Long userId, Pageable pageable);
+
+    List<Item> findByRequestId(Long requestId);
 }

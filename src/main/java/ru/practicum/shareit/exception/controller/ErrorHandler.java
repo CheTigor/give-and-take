@@ -90,4 +90,10 @@ public class ErrorHandler {
     public ErrorResponse handlerIllegalArgumentException(final IllegalArgumentException e) {
         return new ErrorResponse("Unknown state: " + e.getMessage(), e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handlerItemRequestNotFoundException(final ItemRequestNotFoundException e) {
+        return new ErrorResponse("requestId not found ", e.getMessage());
+    }
 }

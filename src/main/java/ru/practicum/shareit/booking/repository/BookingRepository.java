@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.booking.enums.BookingStatus;
@@ -12,20 +14,20 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     //past
-    List<Booking> findByBooker_IdAndEndIsBeforeOrderByStartDesc(Long bookerId, LocalDateTime current);
+    Page<Booking> findByBooker_IdAndEndIsBeforeOrderByStartDesc(Long bookerId, LocalDateTime current, Pageable pageable);
 
     //all
-    List<Booking> findByBooker_idOrderByStartDesc(Long bookerId);
+    Page<Booking> findByBooker_idOrderByStartDesc(Long bookerId, Pageable pageable);
 
     //future
-    List<Booking> findByBooker_idAndStartIsAfterOrderByStartDesc(Long bookerId, LocalDateTime current);
+    Page<Booking> findByBooker_idAndStartIsAfterOrderByStartDesc(Long bookerId, LocalDateTime current, Pageable pageable);
 
     //current
-    List<Booking> findByBooker_idAndEndIsAfterAndStartIsBeforeOrderByStartDesc(Long bookerId, LocalDateTime current,
-                                                                               LocalDateTime current2);
+    Page<Booking> findByBooker_idAndEndIsAfterAndStartIsBeforeOrderByStartDesc(Long bookerId, LocalDateTime end,
+                                                                               LocalDateTime start, Pageable pageable);
 
     //waiting, rejected
-    List<Booking> findByBooker_idAndStatusOrderByStartDesc(Long bookerId, BookingStatus status);
+    Page<Booking> findByBooker_idAndStatusOrderByStartDesc(Long bookerId, BookingStatus status, Pageable pageable);
 
     //itemAvailableValidation
     List<Booking> findByItem_id(Long itemId);
@@ -37,22 +39,22 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                                                       LocalDateTime start);
 
     //allOwnerBookings
-    List<Booking> findByItem_ownerOrderByStartDesc(Long ownerId);
+    Page<Booking> findByItem_ownerOrderByStartDesc(Long ownerId, Pageable pageable);
 
     //pastOwner
-    List<Booking> findByItem_ownerAndEndIsBeforeOrderByStartDesc(Long ownerId, LocalDateTime current);
+    Page<Booking> findByItem_ownerAndEndIsBeforeOrderByStartDesc(Long ownerId, LocalDateTime current, Pageable pageable);
 
     //futureOwner
-    List<Booking> findByItem_ownerAndStartIsAfterOrderByStartDesc(Long ownerId, LocalDateTime current);
+    Page<Booking> findByItem_ownerAndStartIsAfterOrderByStartDesc(Long ownerId, LocalDateTime current, Pageable pageable);
 
     //currentOwner
-    List<Booking> findByItem_ownerAndEndIsAfterAndStartIsBeforeOrderByStartDesc(Long ownerId, LocalDateTime current,
-                                                                                LocalDateTime current2);
+    Page<Booking> findByItem_ownerAndEndIsAfterAndStartIsBeforeOrderByStartDesc(Long ownerId, LocalDateTime current,
+                                                                                LocalDateTime current2, Pageable pageable);
 
     //waiting, rejected owner
-    List<Booking> findByItem_ownerAndStatusOrderByStartDesc(Long ownerId, BookingStatus status);
+    Page<Booking> findByItem_ownerAndStatusOrderByStartDesc(Long ownerId, BookingStatus status, Pageable pageable);
 
     //checkUserTakeItemToCommit
-    List<Booking> findByItem_idAndBooker_idAndStatusAndStartIsBefore(Long itemId, Long userId, BookingStatus bookingStatus,
-                                                                     LocalDateTime start);
+    Booking findFirstByItem_idAndBooker_idAndStatusAndStartIsBefore(Long itemId, Long userId, BookingStatus bookingStatus,
+                                                                    LocalDateTime start);
 }

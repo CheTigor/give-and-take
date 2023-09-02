@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingForItemDtoResponse;
 import ru.practicum.shareit.booking.enums.BookingStatus;
@@ -36,8 +37,8 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
 
     @Autowired
-    public ItemServiceImpl(CommentRepository commentRepository, ItemRepository itemRepository, BookingRepository bookingRepository,
-                           UserRepository userRepository) {
+    public ItemServiceImpl(CommentRepository commentRepository, ItemRepository itemRepository,
+                           BookingRepository bookingRepository, UserRepository userRepository) {
         this.commentRepository = commentRepository;
         this.itemRepository = itemRepository;
         this.bookingRepository = bookingRepository;
@@ -49,11 +50,9 @@ public class ItemServiceImpl implements ItemService {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(String.format("Данный пользователь не найден в базе, userId: %d", userId));
         }
-        final Item item = ItemMapper.toItem(null, userId, itemDto);
-        Long itemId = itemRepository.save(item).getId();
+        final Item item = itemRepository.save(ItemMapper.toItem(null, userId, itemDto));
         log.debug("Успешное создание item: {}", item);
-        return ItemMapper.toItemDto(itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(
-                String.format("Item с id: %d не найден", itemId))));
+        return ItemMapper.toItemDto(item);
     }
 
     @Override
@@ -73,10 +72,9 @@ public class ItemServiceImpl implements ItemService {
         if (forUpdateItemDto.getAvailable() != null) {
             item.setAvailable(forUpdateItemDto.getAvailable());
         }
-        itemRepository.save(item);
+        Item updatedItem = itemRepository.save(item);
         log.debug("Успешное обновление item: {}", item);
-        return ItemMapper.toItemDto(itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(
-                String.format("Item с id: %d не найден", itemId))));
+        return ItemMapper.toItemDto(updatedItem);
     }
 
     @Override
@@ -87,16 +85,16 @@ public class ItemServiceImpl implements ItemService {
         if (itemRepository.existsById(itemId)) {
             return itemResponseBuild(itemId, userId);
         } else {
-            throw new NullPointerException(String.format("Item с itemId: %d не существует", itemId));
+            throw new ItemNotFoundException(String.format("Item с itemId: %d не существует", itemId));
         }
     }
 
     @Override
-    public List<ItemDtoResponse> getAll(Long userId) {
+    public List<ItemDtoResponse> getAll(Long userId, Integer from, Integer size) {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(String.format("Данный пользователь не найден в базе, userId: %d", userId));
         }
-        List<Item> items = itemRepository.findByOwner(userId);
+        List<Item> items = itemRepository.findByOwner(userId, PageRequest.of(from / size, size)).toList();
         List<ItemDtoResponse> itemsWithDates = new ArrayList<>();
         for (Item item : items) {
             itemsWithDates.add(itemResponseBuild(item.getId(), userId));
@@ -117,12 +115,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemsByQuery(String query) {
+    public List<ItemDto> getItemsByQuery(String query, Integer from, Integer size) {
         if (query.isBlank()) {
             return new ArrayList<>();
         }
         String subString = query.toLowerCase();
-        return itemRepository.findByQueryIgnoreCase(subString);
+        return itemRepository.findByQueryIgnoreCase(subString, PageRequest.of(from / size, size)).toList().stream()
+                .map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Override
@@ -131,14 +130,14 @@ public class ItemServiceImpl implements ItemService {
                 String.format("Item с id: %d не найден", itemId)));
         final User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(
                 String.format("User с id: %d не найден", userId)));
-        List<Booking> itemBookings = bookingRepository.findByItem_idAndBooker_idAndStatusAndStartIsBefore(itemId, userId,
+        Booking itemBooking = bookingRepository.findFirstByItem_idAndBooker_idAndStatusAndStartIsBefore(itemId, userId,
                 BookingStatus.APPROVED, LocalDateTime.now());
-        if (itemBookings.size() == 0) {
+        if (itemBooking == null) {
             throw new BadRequestException(String.format("Невозможно создать комментарий - нет бронирований данного " +
                     "предмета пользователем, itemId: %d, userId: %d", itemId, userId));
         }
-        final Comment comment = CommentMapper.toComment(null, commentReq, item, user, LocalDateTime.now());
-        commentRepository.save(comment);
+        final Comment comment = commentRepository.save(CommentMapper.toComment(null, commentReq, item, user,
+                LocalDateTime.now()));
         log.debug("Успешное создание comment: {}", comment);
         return CommentMapper.toCommentResponse(comment);
     }

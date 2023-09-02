@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.ForUpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -9,20 +10,17 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @Slf4j
 @RestController
+@Validated
 @RequestMapping(path = "/users")
 public class UserController {
 
-    private final UserService userService;
-
     @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private UserService userService;
 
     @PostMapping
     public UserDto create(@RequestBody @Valid User user) {
@@ -34,7 +32,7 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public UserDto update(@RequestBody ForUpdateUserDto forUpdateUserDto,
-                          @PathVariable("userId") @NotNull Long userId) {
+                          @PathVariable("userId") @Min(1) Long userId) {
         log.info("PATCH запрос user update - user: \n{},\n userId, \n{}", forUpdateUserDto, userId);
         final UserDto userResp = userService.update(forUpdateUserDto, userId);
         log.info("PATCH ответ user update - user: \n{}", userResp);
@@ -42,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getById(@PathVariable("userId") @NotNull Long userId) {
+    public UserDto getById(@PathVariable("userId") @Min(1) Long userId) {
         log.info("GET запрос item getById - userId: \n{}", userId);
         final UserDto userResp = userService.getById(userId);
         log.info("GET запрос item getById - user: \n{}", userResp);
@@ -58,7 +56,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteById(@PathVariable("userId") @NotNull Long userId) {
+    public void deleteById(@PathVariable("userId") @Min(1) Long userId) {
         log.info("DELETE запрос user deleteById - userId: \n{}", userId);
         userService.deleteById(userId);
     }
