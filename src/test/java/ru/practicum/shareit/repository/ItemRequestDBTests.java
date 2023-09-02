@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.AUTO_CONFIGURED )
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.AUTO_CONFIGURED)
 public class ItemRequestDBTests {
 
     @Autowired
