@@ -16,29 +16,29 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.AUTO_CONFIGURED)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.AUTO_CONFIGURED )
 public class BookingDBTests {
 
     @Autowired
-    BookingRepository bookingRepository;
+    private BookingRepository bookingRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
 
     @Test
     void saveBooking() {
-        Item item = new Item(1L, "name", "description", true, 1L, null);
-        User user = new User(1L, "name", "email@mail.ru");
-        Booking booking = new Booking(null, LocalDateTime.now(), LocalDateTime.now().plusDays(1), item, user,
+        Item item = new Item(null, "name", "description", true, 1L, null);
+        User user = new User(null, "name", "email@mail.ru");
+        User user1 = userRepository.save(user);
+        Item item1 = itemRepository.save(item);
+
+        Booking booking = new Booking(null, LocalDateTime.now(), LocalDateTime.now().plusDays(1), item1, user1,
                 BookingStatus.WAITING);
-
-        userRepository.save(user);
-        itemRepository.save(item);
-
         Assertions.assertNull(booking.getId());
+
         bookingRepository.save(booking);
         Assertions.assertNotNull(booking.getId());
     }

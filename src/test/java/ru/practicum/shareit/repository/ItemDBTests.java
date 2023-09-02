@@ -14,7 +14,7 @@ import java.util.List;
 public class ItemDBTests {
 
     @Autowired
-    ItemRepository repository;
+    private ItemRepository repository;
 
     @Test
     void searchItemByQuery() {

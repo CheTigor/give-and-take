@@ -3,6 +3,7 @@ package ru.practicum.shareit.repository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.request.model.ItemRequest;
@@ -14,18 +15,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.AUTO_CONFIGURED )
 public class ItemRequestDBTests {
 
     @Autowired
-    ItemRequestRepository repository;
+    private ItemRequestRepository repository;
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Test
     void test() {
-        User user = new User(null, "name", "email@mail.ru");
+        final User user = new User(null, "name", "email@mail.ru");
         userRepository.save(user);
-        ItemRequest request = new ItemRequest(null, "description", LocalDateTime.now(), user);
+        final ItemRequest request = new ItemRequest(null, "description", LocalDateTime.now(), user);
         repository.save(request);
 
 
