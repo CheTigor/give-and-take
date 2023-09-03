@@ -104,6 +104,18 @@ public class BookingControllerTests {
     }
 
     @Test
+    void createBookingWithAlreadyIsOwnerException() throws Exception {
+        when(bookingService.create(any(), anyLong())).thenThrow(AlreadyIsOwnerException.class);
+
+        mvc.perform(post("/bookings")
+                        .content(mapper.writeValueAsString(bookingCRD))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is(404));
+    }
+
+    @Test
     void createBookingWithItemNotFoundException() throws Exception {
         when(bookingService.create(any(), anyLong())).thenThrow(ItemNotFoundException.class);
 
@@ -118,6 +130,18 @@ public class BookingControllerTests {
     @Test
     void createBookingWithDataValidationException() throws Exception {
         when(bookingService.create(any(), anyLong())).thenThrow(DateValidationException.class);
+
+        mvc.perform(post("/bookings")
+                        .content(mapper.writeValueAsString(bookingCRD))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is(400));
+    }
+
+    @Test
+    void createBookingWithNotAvailableException() throws Exception {
+        when(bookingService.create(any(), anyLong())).thenThrow(NotAvailableException.class);
 
         mvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(bookingCRD))

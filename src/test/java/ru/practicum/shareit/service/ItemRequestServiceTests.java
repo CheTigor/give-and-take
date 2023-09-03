@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.practicum.shareit.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestGetResponse;
@@ -63,7 +64,7 @@ public class ItemRequestServiceTests {
 
     @Test
     void createRequestWithUserNotFoundException() {
-        Mockito.when(userRepository.findById(anyLong())).thenThrow(UserNotFoundException.class);
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         Assertions.assertThrows(UserNotFoundException.class, () -> itemRequestService.create(description, user.getId()));
     }
@@ -103,5 +104,30 @@ public class ItemRequestServiceTests {
         Mockito.when(userRepository.existsById(anyLong())).thenReturn(false);
 
         Assertions.assertThrows(UserNotFoundException.class, () -> itemRequestService.getAllAnotherRequests(1L, 0, 20));
+    }
+
+    @Test
+    void getByRequestId() {
+        Mockito.when(userRepository.existsById(anyLong())).thenReturn(true);
+        Mockito.when(itemRequestRepository.findById(anyLong())).thenReturn(Optional.of(itemRequest));
+
+        ItemRequestGetResponse itemRequestGRes = itemRequestService.getByRequestId(1L, 1L);
+
+        Assertions.assertEquals(ItemRequestMapper.toItemRequestGetResponse(itemRequest, List.of()), itemRequestGRes);
+    }
+
+    @Test
+    void getByRequestIdWithUserNotFoundException() {
+        Mockito.when(userRepository.existsById(anyLong())).thenReturn(false);
+
+        Assertions.assertThrows(UserNotFoundException.class, () -> itemRequestService.getByRequestId(1L, 1L));
+    }
+
+    @Test
+    void getByRequestIdWithItemRequestNotFoundException() {
+        Mockito.when(userRepository.existsById(anyLong())).thenReturn(true);
+        Mockito.when(itemRequestRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ItemRequestNotFoundException.class, () -> itemRequestService.getByRequestId(1L, 1L));
     }
 }

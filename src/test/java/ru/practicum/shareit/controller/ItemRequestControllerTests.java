@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.request.ItemRequestController;
 import ru.practicum.shareit.request.dto.ItemRequestGetResponse;
 import ru.practicum.shareit.request.dto.ItemRequestPostRequest;
@@ -87,5 +88,14 @@ public class ItemRequestControllerTests {
                         .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(itemRequestGRes)));
+    }
+
+    @Test
+    void getByRequestIdWithItemRequestNotFoundException() throws Exception {
+        when(itemRequestService.getByRequestId(anyLong(), anyLong())).thenThrow(ItemRequestNotFoundException.class);
+
+        mvc.perform(get("/requests/{requestId}", 1)
+                        .header("X-Sharer-User-Id", 1))
+                .andExpect(status().is(404));
     }
 }

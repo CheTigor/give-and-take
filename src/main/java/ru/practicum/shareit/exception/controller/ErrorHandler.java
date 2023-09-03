@@ -14,18 +14,6 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handlerNotFoundException(final NullPointerException e) {
-        return new ErrorResponse("Not Found Exception", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handlerEmailAlreadyExistException(final EmailAlreadyExistException e) {
-        return new ErrorResponse("Email already exist", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handlerMismatchUserIdException(final MismatchUserIdException e) {
         return new ErrorResponse("Not Found Exception", e.getMessage());
     }
@@ -71,12 +59,6 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handlerBookingNotFoundException(final BookingNotFoundException e) {
         return new ErrorResponse("bookingId not found", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handlerUnsupportedStateException(final UnsupportedStateException e) {
-        return new ErrorResponse("Unknown state", e.getMessage());
     }
 
     @ExceptionHandler

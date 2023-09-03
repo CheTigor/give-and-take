@@ -15,18 +15,9 @@ public class BookingMapper {
                 booking.getBooker(), booking.getStatus());
     }
 
-    public static Booking toBooking(BookingDto bookingDto) {
-        return new Booking(bookingDto.getId(), bookingDto.getStart(), bookingDto.getEnd(), bookingDto.getItem(),
-                bookingDto.getBooker(), bookingDto.getStatus());
-    }
-
     public static Booking toBooking(BookingCreateRequestDto bookingCreateRequestDto, User booker, Item item) {
         return new Booking(null, bookingCreateRequestDto.getStart(), bookingCreateRequestDto.getEnd(),
                 item, booker, BookingStatus.WAITING);
-    }
-
-    public static BookingForItemDtoResponse toBookingForItemDtoResponse(Booking booking) {
-        return new BookingForItemDtoResponse(booking.getId(), booking.getBooker().getId());
     }
 
     public static BookingForItemDtoResponse toBookingForItemDtoResponse(BookingDto bookingDto) {

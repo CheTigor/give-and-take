@@ -103,7 +103,7 @@ public class BookingServiceImpl implements BookingService {
                                     PageRequest.of(from / size, size)).stream().map(BookingMapper::toBookingDto)
                             .collect(Collectors.toList());
                 default:
-                    throw new UnsupportedStateException(String.format("Unknown state: %s", state));
+                    return List.of();
             }
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(state);
@@ -142,7 +142,7 @@ public class BookingServiceImpl implements BookingService {
                                     PageRequest.of(from / size, size)).stream().map(BookingMapper::toBookingDto)
                             .collect(Collectors.toList());
                 default:
-                    throw new UnsupportedStateException(String.format("Unknown state: %s", state));
+                    return List.of();
             }
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(state);
