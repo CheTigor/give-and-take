@@ -25,13 +25,13 @@ public class ItemDBTests {
         User user = new User(1L, "name", "email@mail.ru");
         Item item1 = new Item(null, "name", "description", true, user, null);
         Item item2 = new Item(null, "name123", "description", true, user, null);
-        Item item3 = new Item(null, "name", "description123", true, user, null);
+        Item item3 = new Item(null, "name", "description123", false, user, null);
         userRepository.save(user);
         repository.save(item1);
         repository.save(item2);
         repository.save(item3);
-        List<Item> items = repository.findByQueryIgnoreCase(
-                "123", PageRequest.of(0, 20)).toList();
-        Assertions.assertEquals(items, List.of(item2, item3));
+        item2.setId(2L);
+        List<Item> items = repository.findByQueryIgnoreCase("123", PageRequest.of(0, 20)).toList();
+        Assertions.assertEquals(items, List.of(item2));
     }
 }
