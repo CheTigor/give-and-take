@@ -15,17 +15,18 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = BookingController.class)
 public class BookingControllerTests {
@@ -41,15 +42,17 @@ public class BookingControllerTests {
 
     BookingDto bookingDto;
     Item item;
+    ItemDto itemdto;
     User user;
     BookingCreateRequestDto bookingCRD;
 
     @BeforeEach
     void setUp() {
-        item = new Item(1L, "name", "description", true, 1L, null);
         user = new User(1L, "name", "email@mail.ru");
+        item = new Item(1L, "name", "description", true, user, null);
+        itemdto = new ItemDto(1L, "name", "description", true, null);
         bookingDto = new BookingDto(1L, LocalDateTime.of(2023, 1, 1, 1, 1, 1),
-                LocalDateTime.of(2023, 1, 2, 1, 1, 1), item, user,
+                LocalDateTime.of(2023, 1, 2, 1, 1, 1), itemdto, user,
                 BookingStatus.WAITING);
         bookingCRD = new BookingCreateRequestDto(LocalDateTime.of(2023, 1, 1, 1, 1, 1),
                 LocalDateTime.of(2023, 1, 2, 1, 1, 1), 1L);
@@ -64,19 +67,7 @@ public class BookingControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
-                .andExpect(jsonPath("$.start", is(bookingDto.getStart().toString())))
-                .andExpect(jsonPath("$.end", is(bookingDto.getEnd().toString())))
-                .andExpect(jsonPath("$.item.id", is(bookingDto.getItem().getId()), Long.class))
-                .andExpect(jsonPath("$.item.name", is(bookingDto.getItem().getName())))
-                .andExpect(jsonPath("$.item.description", is(bookingDto.getItem().getDescription())))
-                .andExpect(jsonPath("$.item.available", is(bookingDto.getItem().getAvailable())))
-                .andExpect(jsonPath("$.item.owner", is(bookingDto.getItem().getOwner()), Long.class))
-                .andExpect(jsonPath("$.item.requestId", is(bookingDto.getItem().getRequestId())))
-                .andExpect(jsonPath("$.booker.id", is(bookingDto.getBooker().getId()), Long.class))
-                .andExpect(jsonPath("$.booker.name", is(bookingDto.getBooker().getName())))
-                .andExpect(jsonPath("$.booker.email", is(bookingDto.getBooker().getEmail())))
-                .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString())));
+                .andExpect(content().json(mapper.writeValueAsString(bookingDto)));
     }
 
     @Test

@@ -30,8 +30,8 @@ public class BookingDBTests {
 
     @Test
     void saveBooking() {
-        Item item = new Item(null, "name", "description", true, 1L, null);
         User user = new User(null, "name", "email@mail.ru");
+        Item item = new Item(null, "name", "description", true, user, null);
         User user1 = userRepository.save(user);
         Item item1 = itemRepository.save(item);
 

@@ -18,8 +18,12 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
 
+    private final ItemService itemService;
+
     @Autowired
-    private ItemService itemService;
+    public ItemController(ItemService itemService) {
+        this.itemService = itemService;
+    }
 
     @PostMapping
     public ItemDto create(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId) {

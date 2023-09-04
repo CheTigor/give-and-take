@@ -36,11 +36,13 @@ public class ItemServiceTest {
     private User user1NoId;
     private User user2NoId;
     private ItemDto itemNoId;
+    //private Item item;
 
     @BeforeEach
     void setUp() {
         user1NoId = new User(null, "name", "email@mail.ru");
         user2NoId = new User(null, "anotherName", "email@yandex.ru");
+        //item = new Item(null, "name", "description", true, user1NoId, null);
         itemNoId = new ItemDto(null, "name", "description", true, null);
     }
 

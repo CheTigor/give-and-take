@@ -52,7 +52,7 @@ public class BookingServiceTests {
     void setUp() {
         user = new User(1L, "name", "email@mail.ru");
         user2 = new User(2L, "anotherName", "email@yandex.ru");
-        item = new Item(1L, "name", "description", true, 1L, null);
+        item = new Item(1L, "name", "description", true, user, null);
         booking = new Booking(1L, LocalDateTime.of(2024, 1, 1, 1, 1, 1),
                 LocalDateTime.of(2024, 1, 2, 1, 1, 1), item, user2,
                 BookingStatus.APPROVED);
@@ -198,32 +198,32 @@ public class BookingServiceTests {
     @Test
     void getOwnerAll() {
         Mockito.when(userRepository.existsById(anyLong())).thenReturn(true);
-        Mockito.when(bookingRepository.findByItem_ownerOrderByStartDesc(anyLong(), any())).thenReturn(
+        Mockito.when(bookingRepository.findByItem_owner_idOrderByStartDesc(anyLong(), any())).thenReturn(
                 new PageImpl<>(bookings));
         List<BookingDto> bookingAllDtos = bookingService.getOwnerAll("ALL", 1L, 0, 20);
         Assertions.assertEquals(List.of(BookingMapper.toBookingDto(booking)), bookingAllDtos);
 
-        Mockito.when(bookingRepository.findByItem_ownerAndEndIsAfterAndStartIsBeforeOrderByStartDesc(anyLong(), any(),
+        Mockito.when(bookingRepository.findByItem_owner_idAndEndIsAfterAndStartIsBeforeOrderByStartDesc(anyLong(), any(),
                 any(), any())).thenReturn(new PageImpl<>(bookings));
         List<BookingDto> bookingCurrentDtos = bookingService.getOwnerAll("CURRENT", 1L, 0, 20);
         Assertions.assertEquals(List.of(BookingMapper.toBookingDto(booking)), bookingCurrentDtos);
 
-        Mockito.when(bookingRepository.findByItem_ownerAndEndIsBeforeOrderByStartDesc(anyLong(), any(), any()))
+        Mockito.when(bookingRepository.findByItem_owner_idAndEndIsBeforeOrderByStartDesc(anyLong(), any(), any()))
                 .thenReturn(new PageImpl<>(bookings));
         List<BookingDto> bookingPastDtos = bookingService.getOwnerAll("PAST", 1L, 0, 20);
         Assertions.assertEquals(List.of(BookingMapper.toBookingDto(booking)), bookingPastDtos);
 
-        Mockito.when(bookingRepository.findByItem_ownerAndStartIsAfterOrderByStartDesc(anyLong(), any(), any()))
+        Mockito.when(bookingRepository.findByItem_owner_idAndStartIsAfterOrderByStartDesc(anyLong(), any(), any()))
                 .thenReturn(new PageImpl<>(bookings));
         List<BookingDto> bookingFutureDtos = bookingService.getOwnerAll("FUTURE", 1L, 0, 20);
         Assertions.assertEquals(List.of(BookingMapper.toBookingDto(booking)), bookingFutureDtos);
 
-        Mockito.when(bookingRepository.findByItem_ownerAndStatusOrderByStartDesc(anyLong(), any(), any())).thenReturn(
+        Mockito.when(bookingRepository.findByItem_owner_idAndStatusOrderByStartDesc(anyLong(), any(), any())).thenReturn(
                 new PageImpl<>(bookings));
         List<BookingDto> bookingWaitingDtos = bookingService.getOwnerAll("WAITING", 1L, 0, 20);
         Assertions.assertEquals(List.of(BookingMapper.toBookingDto(booking)), bookingWaitingDtos);
 
-        Mockito.when(bookingRepository.findByItem_ownerAndStatusOrderByStartDesc(anyLong(), any(), any())).thenReturn(
+        Mockito.when(bookingRepository.findByItem_owner_idAndStatusOrderByStartDesc(anyLong(), any(), any())).thenReturn(
                 new PageImpl<>(bookings));
         List<BookingDto> bookingRejectedDtos = bookingService.getOwnerAll("REJECTED", 1L, 0, 20);
         Assertions.assertEquals(List.of(BookingMapper.toBookingDto(booking)), bookingRejectedDtos);

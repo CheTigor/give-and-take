@@ -24,6 +24,7 @@ import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -44,6 +45,8 @@ public class ItemServiceTests {
     BookingRepository bookingRepository;
     @Mock
     UserRepository userRepository;
+    @Mock
+    ItemRequestRepository itemRequestRepository;
 
     User user;
     ItemDto itemDto;
@@ -61,9 +64,9 @@ public class ItemServiceTests {
     void setUp() {
         user = new User(1L, "name", "email@mail.ru");
         itemDto = new ItemDto(1L, "name", "description", true, null);
-        item = new Item(1L, "name", "description", true, 1L, null);
+        item = new Item(1L, "name", "description", true, user, null);
         forUpdateItemDto = new ForUpdateItemDto("updateName", "updateDescription", true);
-        updatedItem = new Item(1L, "updateName", "updateDescription", true, 1L,
+        updatedItem = new Item(1L, "updateName", "updateDescription", true, user,
                 null);
         itemDtoResponse = new ItemDtoResponse(1L, "name", "description", true, null,
                 null, List.of());
@@ -73,12 +76,13 @@ public class ItemServiceTests {
         comment = new Comment(1L, "text", item, user,
                 LocalDateTime.of(2023, 1, 1, 1, 1, 1));
 
-        itemService = new ItemServiceImpl(commentRepository, itemRepository, bookingRepository, userRepository);
+        itemService = new ItemServiceImpl(commentRepository, itemRepository, bookingRepository, userRepository,
+                itemRequestRepository);
     }
 
     @Test
     void createItem() {
-        Mockito.when(userRepository.existsById(anyLong())).thenReturn(true);
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         Mockito.when(itemRepository.save(any())).thenReturn(item);
 
         ItemDto itemDto2 = itemService.create(itemDto, 1L);
@@ -88,7 +92,7 @@ public class ItemServiceTests {
 
     @Test
     void createItemWithUserNotFoundException() {
-        Mockito.when(userRepository.existsById(anyLong())).thenReturn(false);
+        Mockito.when(userRepository.findById(anyLong())).thenThrow(UserNotFoundException.class);
 
         Assertions.assertThrows(UserNotFoundException.class, () ->
                 itemService.create(itemDto, 1L));
@@ -129,9 +133,9 @@ public class ItemServiceTests {
         //itemResponseBuild
         Mockito.when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
         Mockito.when(commentRepository.findByItemId(anyLong())).thenReturn(List.of());
-        Mockito.when(bookingRepository.findByItem_idAndItem_ownerAndStatusAndStartIsBefore(any(), any(), any(), any()))
+        Mockito.when(bookingRepository.findByItem_idAndItem_owner_idAndStatusAndStartIsBefore(any(), any(), any(), any()))
                 .thenReturn(List.of());
-        Mockito.when(bookingRepository.findByItem_idAndItem_ownerAndStartIsAfterAndStatus(any(), any(), any(), any()))
+        Mockito.when(bookingRepository.findByItem_idAndItem_owner_idAndStartIsAfterAndStatus(any(), any(), any(), any()))
                 .thenReturn(List.of());
 
         ItemDtoResponse itemDtoResponse1 = itemService.getById(1L, 1L);
@@ -159,13 +163,13 @@ public class ItemServiceTests {
     @Test
     void getAll() {
         Mockito.when(userRepository.existsById(anyLong())).thenReturn(true);
-        Mockito.when(itemRepository.findByOwner(anyLong(), any())).thenReturn(new PageImpl<>(List.of(item)));
+        Mockito.when(itemRepository.findByOwner_id(anyLong(), any())).thenReturn(new PageImpl<>(List.of(item)));
         //itemResponseBuild
         Mockito.when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
         Mockito.when(commentRepository.findByItemId(anyLong())).thenReturn(List.of());
-        Mockito.when(bookingRepository.findByItem_idAndItem_ownerAndStatusAndStartIsBefore(any(), any(), any(), any()))
+        Mockito.when(bookingRepository.findByItem_idAndItem_owner_idAndStatusAndStartIsBefore(any(), any(), any(), any()))
                 .thenReturn(List.of());
-        Mockito.when(bookingRepository.findByItem_idAndItem_ownerAndStartIsAfterAndStatus(any(), any(), any(), any()))
+        Mockito.when(bookingRepository.findByItem_idAndItem_owner_idAndStartIsAfterAndStatus(any(), any(), any(), any()))
                 .thenReturn(List.of());
 
         List<ItemDtoResponse> items = itemService.getAll(1L, 0, 20);
@@ -210,7 +214,8 @@ public class ItemServiceTests {
 
     @Test
     void getItemsByQuery() {
-        Mockito.when(itemRepository.findByQueryIgnoreCase(anyString(), any())).thenReturn(new PageImpl<>(List.of(item)));
+        Mockito.when(itemRepository.findByQueryIgnoreCase(anyString(),
+                any())).thenReturn(new PageImpl<>(List.of(item)));
 
         List<ItemDto> items = itemService.getItemsByQuery("name", 0, 20);
 

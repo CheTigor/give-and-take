@@ -41,7 +41,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestPostResponse create(ItemRequestPostRequest description, Long userId) {
         final User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(
                 String.format("User с id: %d не найден", userId)));
-        ItemRequest itemRequest = itemRequestRepository.save(new ItemRequest(null, description.getDescription(),
+        final ItemRequest itemRequest = itemRequestRepository.save(new ItemRequest(null, description.getDescription(),
                 LocalDateTime.now(), user));
         log.debug("Успешное сохранение request: {}", itemRequest);
         return ItemRequestMapper.toItemRequestPostResponse(itemRequest);
@@ -52,8 +52,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(String.format("User с id: %d не найден", userId));
         }
-        List<ItemRequestGetResponse> response = new ArrayList<>();
-        List<ItemRequest> itemRequests = itemRequestRepository.findByRequester_idOrderByCreatedDesc(userId);
+        final List<ItemRequestGetResponse> response = new ArrayList<>();
+        final List<ItemRequest> itemRequests = itemRequestRepository.findByRequester_idOrderByCreatedDesc(userId);
         for (ItemRequest itemRequest : itemRequests) {
             response.add(getResponseBuild(itemRequest));
         }
@@ -65,8 +65,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         if (!userRepository.existsById(requesterId)) {
             throw new UserNotFoundException(String.format("User с id: %d не найден", requesterId));
         }
-        List<ItemRequestGetResponse> response = new ArrayList<>();
-        List<ItemRequest> allRequests = itemRequestRepository.findNotByRequester_Id(requesterId, PageRequest.of(
+        final List<ItemRequestGetResponse> response = new ArrayList<>();
+        final List<ItemRequest> allRequests = itemRequestRepository.findNotByRequester_Id(requesterId, PageRequest.of(
                 from / size, size));
         for (ItemRequest itemRequest : allRequests) {
             response.add(getResponseBuild(itemRequest));
@@ -79,13 +79,13 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(String.format("User с id: %d не найден", userId));
         }
-        ItemRequest request = itemRequestRepository.findById(requestId).orElseThrow(() ->
+        final ItemRequest request = itemRequestRepository.findById(requestId).orElseThrow(() ->
                 new ItemRequestNotFoundException(String.format("Request нет в базе: %d", requestId)));
         return getResponseBuild(request);
     }
 
     private ItemRequestGetResponse getResponseBuild(ItemRequest itemRequest) {
-        List<Item> items = itemRepository.findByRequestId(itemRequest.getId());
+        List<Item> items = itemRepository.findByRequest_id(itemRequest.getId());
         return ItemRequestMapper.toItemRequestGetResponse(itemRequest, items);
     }
 }

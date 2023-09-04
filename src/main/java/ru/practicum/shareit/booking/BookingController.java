@@ -19,8 +19,12 @@ import java.util.List;
 @RequestMapping(path = "/bookings")
 public class BookingController {
 
+    private final BookingService bookingService;
+
     @Autowired
-    private BookingService bookingService;
+    public BookingController(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
 
     @PostMapping
     public BookingDto create(@RequestBody @Valid BookingCreateRequestDto bookingReq,

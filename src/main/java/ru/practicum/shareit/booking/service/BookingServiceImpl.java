@@ -46,7 +46,7 @@ public class BookingServiceImpl implements BookingService {
         if (!dateValidation(bookingReq)) {
             throw new DateValidationException("Неверный формат даты");
         }
-        if (item.getOwner().equals(bookerId)) {
+        if (item.getOwner().getId().equals(bookerId)) {
             throw new AlreadyIsOwnerException(String.format("Booker уже является владельцем вещи, bookerId: %d, itemId: %d",
                     bookerId, item.getId()));
         }
@@ -63,7 +63,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto getById(Long bookingId, Long userId) {
         final Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException(
                 String.format("Booking с id: %d не найден", bookingId)));
-        if (booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().equals(userId)) {
+        if (booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().getId().equals(userId)) {
             return BookingMapper.toBookingDto(booking);
         } else {
             throw new UserNotFoundException(String.format(
@@ -119,26 +119,26 @@ public class BookingServiceImpl implements BookingService {
             BookingState stateLC = BookingState.valueOf(state);
             switch (stateLC) {
                 case ALL:
-                    return bookingRepository.findByItem_ownerOrderByStartDesc(userId, PageRequest.of(from / size, size)).stream()
+                    return bookingRepository.findByItem_owner_idOrderByStartDesc(userId, PageRequest.of(from / size, size)).stream()
                             .map(BookingMapper::toBookingDto).collect(Collectors.toList());
                 case CURRENT:
-                    return bookingRepository.findByItem_ownerAndEndIsAfterAndStartIsBeforeOrderByStartDesc(userId,
+                    return bookingRepository.findByItem_owner_idAndEndIsAfterAndStartIsBeforeOrderByStartDesc(userId,
                                     LocalDateTime.now(), LocalDateTime.now(), PageRequest.of(from / size, size)).stream()
                             .map(BookingMapper::toBookingDto).collect(Collectors.toList());
                 case PAST:
-                    return bookingRepository.findByItem_ownerAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now(),
+                    return bookingRepository.findByItem_owner_idAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now(),
                                     PageRequest.of(from / size, size)).stream().map(BookingMapper::toBookingDto)
                             .collect(Collectors.toList());
                 case FUTURE:
-                    return bookingRepository.findByItem_ownerAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now(),
+                    return bookingRepository.findByItem_owner_idAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now(),
                                     PageRequest.of(from / size, size)).stream().map(BookingMapper::toBookingDto)
                             .collect(Collectors.toList());
                 case WAITING:
-                    return bookingRepository.findByItem_ownerAndStatusOrderByStartDesc(userId, BookingStatus.WAITING,
+                    return bookingRepository.findByItem_owner_idAndStatusOrderByStartDesc(userId, BookingStatus.WAITING,
                                     PageRequest.of(from / size, size)).stream().map(BookingMapper::toBookingDto)
                             .collect(Collectors.toList());
                 case REJECTED:
-                    return bookingRepository.findByItem_ownerAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED,
+                    return bookingRepository.findByItem_owner_idAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED,
                                     PageRequest.of(from / size, size)).stream().map(BookingMapper::toBookingDto)
                             .collect(Collectors.toList());
                 default:
@@ -160,7 +160,7 @@ public class BookingServiceImpl implements BookingService {
         if (approved) {
             status = BookingStatus.APPROVED;
         }
-        final Long ownerId = booking.getItem().getOwner();
+        final Long ownerId = booking.getItem().getOwner().getId();
         if (ownerId.equals(userId)) {
             booking.setStatus(status);
         } else {

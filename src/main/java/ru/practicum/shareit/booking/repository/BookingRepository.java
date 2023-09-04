@@ -32,27 +32,27 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     //itemAvailableValidation
     List<Booking> findByItem_id(Long itemId);
 
-    List<Booking> findByItem_idAndItem_ownerAndStartIsAfterAndStatus(Long itemId, Long userId, LocalDateTime start,
-                                                                     BookingStatus bookingStatus);
+    List<Booking> findByItem_idAndItem_owner_idAndStartIsAfterAndStatus(Long itemId, Long userId, LocalDateTime start,
+                                                                        BookingStatus bookingStatus);
 
-    List<Booking> findByItem_idAndItem_ownerAndStatusAndStartIsBefore(Long itemId, Long userId, BookingStatus status,
-                                                                      LocalDateTime start);
+    List<Booking> findByItem_idAndItem_owner_idAndStatusAndStartIsBefore(Long itemId, Long userId, BookingStatus status,
+                                                                         LocalDateTime start);
 
     //allOwnerBookings
-    Page<Booking> findByItem_ownerOrderByStartDesc(Long ownerId, Pageable pageable);
+    Page<Booking> findByItem_owner_idOrderByStartDesc(Long ownerId, Pageable pageable);
 
     //pastOwner
-    Page<Booking> findByItem_ownerAndEndIsBeforeOrderByStartDesc(Long ownerId, LocalDateTime current, Pageable pageable);
+    Page<Booking> findByItem_owner_idAndEndIsBeforeOrderByStartDesc(Long ownerId, LocalDateTime current, Pageable pageable);
 
     //futureOwner
-    Page<Booking> findByItem_ownerAndStartIsAfterOrderByStartDesc(Long ownerId, LocalDateTime current, Pageable pageable);
+    Page<Booking> findByItem_owner_idAndStartIsAfterOrderByStartDesc(Long ownerId, LocalDateTime current, Pageable pageable);
 
     //currentOwner
-    Page<Booking> findByItem_ownerAndEndIsAfterAndStartIsBeforeOrderByStartDesc(Long ownerId, LocalDateTime current,
-                                                                                LocalDateTime current2, Pageable pageable);
+    Page<Booking> findByItem_owner_idAndEndIsAfterAndStartIsBeforeOrderByStartDesc(Long ownerId, LocalDateTime current,
+                                                                                   LocalDateTime current2, Pageable pageable);
 
     //waiting, rejected owner
-    Page<Booking> findByItem_ownerAndStatusOrderByStartDesc(Long ownerId, BookingStatus status, Pageable pageable);
+    Page<Booking> findByItem_owner_idAndStatusOrderByStartDesc(Long ownerId, BookingStatus status, Pageable pageable);
 
     //checkUserTakeItemToCommit
     Booking findFirstByItem_idAndBooker_idAndStatusAndStartIsBefore(Long itemId, Long userId, BookingStatus bookingStatus,

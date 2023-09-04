@@ -72,7 +72,7 @@ public class ItemRequestServiceTests {
     @Test
     void getAllByUserId() {
         Mockito.when(userRepository.existsById(anyLong())).thenReturn(true);
-        Mockito.when(itemRepository.findByRequestId(anyLong())).thenReturn(List.of());
+        Mockito.when(itemRepository.findByRequest_id(anyLong())).thenReturn(List.of());
         Mockito.when(itemRequestRepository.findByRequester_idOrderByCreatedDesc(anyLong())).thenReturn(List.of(itemRequest));
 
         List<ItemRequestGetResponse> response = itemRequestService.getByUserId(user.getId());
@@ -90,7 +90,7 @@ public class ItemRequestServiceTests {
     @Test
     void getAllWithoutId() {
         Mockito.when(itemRequestRepository.findNotByRequester_Id(anyLong(), any())).thenReturn(List.of(itemRequest));
-        Mockito.when(itemRepository.findByRequestId(anyLong())).thenReturn(List.of());
+        Mockito.when(itemRepository.findByRequest_id(anyLong())).thenReturn(List.of());
         Mockito.when(userRepository.existsById(anyLong())).thenReturn(true);
 
 

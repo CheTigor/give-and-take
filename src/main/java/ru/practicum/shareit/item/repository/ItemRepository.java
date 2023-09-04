@@ -12,12 +12,12 @@ import java.util.List;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    @Query(value = "select it " +
-            "from Item as it " +
-            "where (lower(it.name) like %?1% or lower(it.description) like %?1%) and it.available = true ")
+    @Query("SELECT it " +
+            "FROM Item AS it " +
+            "WHERE (LOWER(it.name) LIKE %?1% OR LOWER(it.description) LIKE %?1%) and it.available = true")
     Page<Item> findByQueryIgnoreCase(String querySearch, Pageable pageable);
 
-    Page<Item> findByOwner(Long userId, Pageable pageable);
+    Page<Item> findByOwner_id(Long userId, Pageable pageable);
 
-    List<Item> findByRequestId(Long requestId);
+    List<Item> findByRequest_id(Long requestId);
 }

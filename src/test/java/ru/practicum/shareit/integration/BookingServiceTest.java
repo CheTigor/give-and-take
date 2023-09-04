@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
@@ -65,7 +66,7 @@ public class BookingServiceTest {
         assertThat(bookingDto1.getId(), notNullValue());
         assertThat(bookingDto1.getStart(), equalTo(bookingDto.getStart()));
         assertThat(bookingDto1.getEnd(), equalTo(bookingDto.getEnd()));
-        assertThat(bookingDto1.getItem(), equalTo(item));
+        assertThat(bookingDto1.getItem(), equalTo(ItemMapper.toItemDto(item)));
         assertThat(bookingDto1.getBooker(), equalTo(user));
         assertThat(bookingDto1.getStatus(), equalTo(BookingStatus.APPROVED));
     }
