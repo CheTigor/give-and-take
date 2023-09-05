@@ -10,13 +10,13 @@ public interface ItemService {
 
     ItemDto update(ForUpdateItemDto forUpdateItemDto, Long itemId, Long userId);
 
-    ItemDtoResponse getById(Long id, Long userId);
+    ItemDtoResponse getById(Long itemId, Long userId);
 
-    List<ItemDtoResponse> getAll(Long userId);
+    List<ItemDtoResponse> getAll(Long userId, Integer from, Integer size);
 
-    void deleteById(Long id, Long userId);
+    void deleteById(Long itemId, Long userId);
 
-    List<ItemDto> getItemsByQuery(String query);
+    List<ItemDto> getItemsByQuery(String query, Integer from, Integer size);
 
     CommentResponseDto createComment(CommentRequestDto commentReq, Long itemId, Long userId);
 }

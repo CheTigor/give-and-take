@@ -12,15 +12,24 @@ CREATE TABLE IF NOT EXISTS users (
     CONSTRAINT uq_user_email UNIQUE(email)
 );
 
+CREATE TABLE IF NOT EXISTS requests (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    description VARCHAR(500),
+    created TIMESTAMP,
+    requester_id BIGINT,
+    CONSTRAINT fk_requests_to_users FOREIGN KEY(requester_id) REFERENCES users(id),
+    UNIQUE(id)
+);
+
 CREATE TABLE IF NOT EXISTS items (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(100),
     description VARCHAR(500),
     available BOOLEAN,
     user_id BIGINT,
-    request_user_id BIGINT,
+    request_id BIGINT,
     CONSTRAINT fk_items_to_users FOREIGN KEY(user_id) REFERENCES users(id),
-    CONSTRAINT fk_items_to_request FOREIGN KEY(request_user_id) REFERENCES users(id),
+    CONSTRAINT fk_items_to_request FOREIGN KEY(request_id) REFERENCES requests(id),
     CONSTRAINT uq_item_id UNIQUE(id)
 );
 
@@ -33,14 +42,6 @@ CREATE TABLE IF NOT EXISTS bookings (
     status VARCHAR(50),
     CONSTRAINT fk_booking_to_users FOREIGN KEY(booker_id) REFERENCES users(id),
     CONSTRAINT fk_booking_to_item FOREIGN KEY(item_id) REFERENCES items(id),
-    UNIQUE(id)
-);
-
-CREATE TABLE IF NOT EXISTS requests (
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    description VARCHAR(500),
-    requester_id BIGINT,
-    CONSTRAINT fk_requests_to_users FOREIGN KEY(requester_id) REFERENCES users(id),
     UNIQUE(id)
 );
 

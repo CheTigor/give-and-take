@@ -9,7 +9,4 @@ public class UserMapper {
         return new UserDto(user.getId(), user.getName(), user.getEmail());
     }
 
-    public static User toUser(long id, UserDto userDto) {
-        return new User(id, userDto.getName(), userDto.getEmail());
-    }
 }

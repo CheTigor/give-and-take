@@ -2,16 +2,18 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/items")
 public class ItemController {
@@ -24,7 +26,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto create(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") @NotNull Long userId) {
+    public ItemDto create(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId) {
         log.info("POST запрос item create - item: \n{},\n userId: \n{}", itemDto, userId);
         final ItemDto itemResp = itemService.create(itemDto, userId);
         log.info("POST ответ item create - item: \n{}", itemResp);
@@ -32,8 +34,8 @@ public class ItemController {
     }
 
     @PatchMapping(value = "/{itemId}")
-    public ItemDto update(@RequestBody @Valid ForUpdateItemDto forUpdateItemDto, @PathVariable @NotNull Long itemId,
-                          @RequestHeader("X-Sharer-User-Id") @NotNull Long userId) {
+    public ItemDto update(@RequestBody @Valid ForUpdateItemDto forUpdateItemDto, @PathVariable @Min(1) Long itemId,
+                          @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId) {
         log.info("PATCH запрос item update - itemId: \n{},\n userId: \n{}", itemId, userId);
         final ItemDto itemResp = itemService.update(forUpdateItemDto, itemId, userId);
         log.info("PATCH ответ item update - item: \n{}", itemResp);
@@ -41,8 +43,8 @@ public class ItemController {
     }
 
     @GetMapping(value = "/{itemId}")
-    public ItemDtoResponse getById(@PathVariable("itemId") @NotNull Long itemId,
-                                   @RequestHeader("X-Sharer-User-Id") @NotNull Long userId) {
+    public ItemDtoResponse getById(@PathVariable("itemId") @Min(1) Long itemId,
+                                   @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId) {
         log.info("GET запрос item getById - itemId: \n{},\n userId: \n{}", itemId, userId);
         final ItemDtoResponse itemResp = itemService.getById(itemId, userId);
         log.info("GET ответ item getById - item: \n{}", itemResp);
@@ -50,31 +52,35 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoResponse> getAll(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId) {
+    public List<ItemDtoResponse> getAll(@RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+                                        @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
+                                        @RequestParam(value = "size", defaultValue = "20") @Min(1) Integer size) {
         log.info("GET запрос item getAll - userId: \n{}", userId);
-        final List<ItemDtoResponse> itemResp = itemService.getAll(userId);
+        final List<ItemDtoResponse> itemResp = itemService.getAll(userId, from, size);
         log.info("GET запрос item getAll - item: \n{}", itemResp);
         return itemResp;
     }
 
     @DeleteMapping(value = "/{itemId}")
-    public void deleteById(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") @NotNull Long userId) {
+    public void deleteById(@PathVariable @Min(1) Long itemId, @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId) {
         log.info("DELETE запрос item deleteById - itemId: \n{},\n userId: \n{}", itemId, userId);
         itemService.deleteById(itemId, userId);
     }
 
-    @GetMapping("/search") //фильмы по популярности
-    public List<ItemDto> getItemsByQuery(@RequestParam("text") @NotBlank String query) {
+    @GetMapping("/search")
+    public List<ItemDto> getItemsByQuery(@RequestParam("text") @NotNull String query,
+                                         @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
+                                         @RequestParam(value = "size", defaultValue = "20") @Min(1) Integer size) {
         log.info("GET запрос item getItemsByQuery - query: \n{}", query);
-        final List<ItemDto> itemResp = itemService.getItemsByQuery(query);
+        final List<ItemDto> itemResp = itemService.getItemsByQuery(query, from, size);
         log.info("GET ответ item getItemsByQuery - item: \n{}", itemResp);
         return itemResp;
     }
 
     @PostMapping("/{itemId}/comment")
     public CommentResponseDto createComment(@RequestBody @Valid CommentRequestDto commentReq,
-                                            @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
-                                            @PathVariable("itemId") @NotNull Long itemId) {
+                                            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+                                            @PathVariable("itemId") @Min(1) Long itemId) {
         log.info("POST запрос item createComment - comment: \n{},\n userId: \n{},\n itemId: \n{}", commentReq, userId,
                 itemId);
         final CommentResponseDto commentResp = itemService.createComment(commentReq, itemId, userId);

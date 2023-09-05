@@ -14,18 +14,6 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handlerNotFoundException(final NullPointerException e) {
-        return new ErrorResponse("Not Found Exception", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handlerEmailAlreadyExistException(final EmailAlreadyExistException e) {
-        return new ErrorResponse("Email already exist", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handlerMismatchUserIdException(final MismatchUserIdException e) {
         return new ErrorResponse("Not Found Exception", e.getMessage());
     }
@@ -75,12 +63,6 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handlerUnsupportedStateException(final UnsupportedStateException e) {
-        return new ErrorResponse("Unknown state", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handlerBadRequestException(final BadRequestException e) {
         return new ErrorResponse("Bad request exception", e.getMessage());
     }
@@ -89,5 +71,11 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handlerIllegalArgumentException(final IllegalArgumentException e) {
         return new ErrorResponse("Unknown state: " + e.getMessage(), e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handlerItemRequestNotFoundException(final ItemRequestNotFoundException e) {
+        return new ErrorResponse("requestId not found ", e.getMessage());
     }
 }
