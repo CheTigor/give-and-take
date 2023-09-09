@@ -2,7 +2,6 @@ package ru.practicum.shareit.booking;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingCreateRequestDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -11,7 +10,6 @@ import ru.practicum.shareit.booking.service.BookingService;
 import java.util.List;
 
 @Slf4j
-@Validated
 @RestController
 @RequestMapping(path = "/bookings")
 public class BookingController {
@@ -69,7 +67,7 @@ public class BookingController {
                                         @RequestParam(value = "from") Integer from,
                                         @RequestParam(value = "size") Integer size,
                                         @RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("GET запрос booking getOwnerAll - state: \n{},\n userId: \n{}", state, userId);
+        log.info("GET запрос booking getOwnerAll - state: \n{},\n iserId: \n{}", state, userId);
         final List<BookingDto> bookingResp = bookingService.getOwnerAll(state, userId, from, size);
         log.info("GET ответ booking getOwnerAll - bookings: \n{}", bookingResp);
         return bookingResp;

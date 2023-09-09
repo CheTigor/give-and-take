@@ -20,7 +20,7 @@ public class ItemRequestController {
     private final ItemRequestClient itemRequestClient;
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody @Valid ItemRequestPostRequest description,
+    public ResponseEntity<Object> createRequest(@RequestBody @Valid ItemRequestPostRequest description,
                                          @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId) {
         log.info("POST запрос itemRequest create - request: \n{},\n userId: \n{}", description, userId);
         final ResponseEntity<Object> response = itemRequestClient.createRequest(description, userId);
@@ -38,10 +38,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllAnotherRequests(@RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
-                                                        @RequestParam(value = "from", defaultValue = "0")
-                                                        @Min(0) Integer from,
-                                                        @RequestParam(value = "size", defaultValue = "20")
-                                                        @Min(1) Integer size) {
+                                                        @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
+                                                        @RequestParam(value = "size", defaultValue = "20") @Min(1) Integer size) {
         log.info("Get запрос itemRequest getAllAnotherRequests - userId: \n{}, from: \n{}, size: \n{}", userId, from,
                 size);
         final ResponseEntity<Object> response = itemRequestClient.getAllAnotherRequests(userId, from, size);

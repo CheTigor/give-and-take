@@ -42,6 +42,7 @@ public class BookingController {
         return bookingResp;
     }
 
+    @ResponseBody
     @GetMapping("/{bookingId}")
     public ResponseEntity<Object> getBookingById(@PathVariable @Min(1) Long bookingId,
                                                  @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId) {

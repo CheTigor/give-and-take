@@ -13,6 +13,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handlerBadRequestException(final IllegalArgumentException e) {
-        return new ErrorResponse("Bad request exception", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 }

@@ -38,12 +38,12 @@ public class UserController {
                 throw new IllegalArgumentException(String.format("Неверный формат имени: %s", user.getName()));
             }
         }
-            if (user.getEmail() != null && !EmailValidator.getInstance().isValid(user.getEmail())) {
-                throw new IllegalArgumentException(String.format("Неверный формат email: %s", user.getEmail()));
-            }
-               final ResponseEntity<Object> userResp = userClient.updateUser(user, userId);
-            log.info("PATCH ответ user update - response: \n{}", userResp);
-            return userResp;
+        if (user.getEmail() != null && !EmailValidator.getInstance().isValid(user.getEmail())) {
+            throw new IllegalArgumentException(String.format("Неверный формат email: %s", user.getEmail()));
+        }
+        final ResponseEntity<Object> userResp = userClient.updateUser(user, userId);
+        log.info("PATCH ответ user update - response: \n{}", userResp);
+        return userResp;
     }
 
     @GetMapping("/{userId}")

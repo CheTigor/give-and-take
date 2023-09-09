@@ -17,7 +17,6 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +37,6 @@ public class BookingServiceImpl implements BookingService {
         this.userRepository = userRepository;
     }
 
-    @Transactional
     @Override
     public BookingDto create(BookingCreateRequestDto bookingReq, Long bookerId) {
         final User user = userRepository.findById(bookerId).orElseThrow(() -> new UserNotFoundException(
@@ -151,7 +149,6 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    @Transactional
     @Override
     public BookingDto decideBooking(Long bookingId, Long userId, Boolean approved) {
         final Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException(
